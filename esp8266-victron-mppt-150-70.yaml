@@ -1,0 +1,111 @@
+substitutions:
+  name: esp8266-victron-mppt-150-70
+  device_description: "Monitor SmartSolar MPPT 150/70"
+  external_components_source: github://KinDR007/VictronMPPT-ESPHOME@main
+
+esphome:
+  name: ${name}
+  comment: ${device_description}
+  friendly_name: esp8266-mppt-150-70
+  platform: ESP8266
+  board: d1_mini
+
+external_components:
+  - source: ${external_components_source}
+    refresh: 0s
+
+wifi:
+  ssid: "casaIoT"
+  password: "ioturiledincasa"
+  manual_ip:
+    # Set this to the IP of the ESP
+    static_ip: 10.0.0.14
+    # Set this to the IP address of the router. Often ends with .1
+    gateway: 10.0.0.1
+    # The subnet of the network. 255.255.255.0 works for most home networks.
+    subnet: 255.255.255.0
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp8266-mppt-150-70"
+    password: "C0gH9pTrsnCD"
+# Enable logging
+
+logger:
+  baud_rate: 0
+  esp8266_store_log_strings_in_flash: false
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "GycySLRzTrEDB64+rEhWEhXyJLJV4KB2b9A4e8fudyc="
+# GycySLRzTrEDB64+rEhWEhXyJLJV4KB2b9A4e8fudyc=
+ota:
+
+uart:
+  id: uart_0
+  tx_pin: D8  # Not connected! The communication is read-only
+  rx_pin: D7  # Connect this this GPIO and GND to the MPPT charger
+  baud_rate: 19200
+  rx_buffer_size: 256
+
+victron:
+  uart_id: uart_0
+  id: victron0
+  throttle: 10s
+
+sensor:
+  - platform: victron
+    victron_id: victron0
+    max_power_yesterday:
+      name: "${name} max power yesterday"
+    max_power_today:
+      name: "${name} max power today"
+    yield_total:
+      name: "${name} yield total"
+    yield_yesterday:
+      name: "${name} yield yesterday"
+    yield_today:
+      name: "${name} yield today"
+    panel_voltage:
+      name: "${name} panel voltage"
+    panel_power:
+      name: "${name} panel power"
+    battery_current:
+      name: "${name} panel current"
+    battery_voltage:
+      name: "${name} battery voltage"
+    day_number:
+      name: "${name} day number"
+    charging_mode_id:
+      name: "${name} charging mode id"
+    error_code:
+      name: "${name} error code"
+    tracking_mode_id:
+      name: "${name} tracking mode id"
+    load_current:
+      name: "${name} load current"
+
+text_sensor:
+  - platform: victron
+    victron_id: victron0
+    charging_mode:
+      name: "${name} charging mode"
+    error:
+      name: "${name} error"
+    tracking_mode:
+      name: "${name} tracking mode"
+    firmware_version:
+      name: "${name} firmware version"
+    device_type:
+      name: "${name} device type"
+    serial_number:
+      name: "${name} serial number"
+
+binary_sensor:
+  - platform: victron
+    victron_id: victron0
+    load_state:
+      name: "${name} load state"
+    relay_state:
+      name: "${name} relay state"
+    
